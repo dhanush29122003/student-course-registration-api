@@ -1,51 +1,77 @@
 # Student Course Registration & Management API
 
-A learning project for practicing Java, Spring Boot, REST APIs, Hibernate/JPA, MySQL, validation, and exception handling.
+A Java backend learning project built with Spring Boot, REST APIs, Spring Data JPA, Hibernate, and MySQL.
 
-> Status: starter implementation generated for learning. Run it locally, test the endpoints, and verify each feature before describing it as completed on a public profile.
+The API supports student and course management, course registration, duplicate-enrollment prevention, and course-capacity validation.
+
+## Technologies
+
+- Java 17+
+- Spring Boot
+- Maven
+- Spring Data JPA / Hibernate
+- MySQL 8+
+- REST APIs
+- PowerShell for local API testing
 
 ## Requirements
-- Java 17+
-- Maven 3.9+
-- MySQL 8+
 
-## 1. Create the database
-You can let the configured JDBC URL create the `course_registration` database automatically if your MySQL user has permission. Otherwise run:
+- Java 17 or newer
+- Maven
+- MySQL Server 8 or newer
+
+## Setup
+
+### 1. Create the database
+
+Create the database in MySQL:
+
 ```sql
-CREATE DATABASE course_registration;
+CREATE DATABASE IF NOT EXISTS course_registration;
 ```
 
-## 2. Configure database credentials
-Set environment variables before running:
-- `DB_URL` (default: `jdbc:mysql://localhost:3306/course_registration?createDatabaseIfNotExist=true`)
-- `DB_USERNAME` (default: `root`)
-- `DB_PASSWORD` (default is a placeholder; set your real local password)
+### 2. Configure database credentials
 
-Windows PowerShell example:
+The application reads its database settings from environment variables:
+
+- `DB_URL` — defaults to the local `course_registration` database.
+- `DB_USERNAME` — defaults to `root`.
+- `DB_PASSWORD` — must be set to your local MySQL password.
+
+In Windows PowerShell, set the variables before starting the application:
+
 ```powershell
-$env:DB_USERNAME="root"
-$env:DB_PASSWORD="your-local-mysql-password"
+$env:DB_USERNAME = "root"
+$env:DB_PASSWORD = Read-Host "Enter your MySQL root password"
 mvn spring-boot:run
 ```
 
-Do not commit passwords to GitHub. For a local setup, you can also edit `application.properties`, but keep real credentials out of version control.
+Do not commit real passwords or other secrets to source control.
 
-## 3. Run
-```bash
+### 3. Run the application
+
+From the folder containing `pom.xml`, run:
+
+```powershell
 mvn spring-boot:run
 ```
-The API listens on `http://localhost:8080`.
 
-## Endpoints
+The API runs at `http://localhost:8080`.
+
+## API Endpoints
 
 ### Students
-- `GET /api/students` — list students
-- `GET /api/students/{id}` — get one student
-- `POST /api/students` — create student
-- `PUT /api/students/{id}` — update student
-- `DELETE /api/students/{id}` — delete student
 
-Example `POST /api/students`:
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/students` | List students |
+| GET | `/api/students/{id}` | Get one student |
+| POST | `/api/students` | Create a student |
+| PUT | `/api/students/{id}` | Update a student |
+| DELETE | `/api/students/{id}` | Delete a student |
+
+Example request body:
+
 ```json
 {
   "fullName": "Asha Rao",
@@ -54,13 +80,17 @@ Example `POST /api/students`:
 ```
 
 ### Courses
-- `GET /api/courses` — list courses
-- `GET /api/courses/{id}` — get one course
-- `POST /api/courses` — create course
-- `PUT /api/courses/{id}` — update course
-- `DELETE /api/courses/{id}` — delete course
 
-Example `POST /api/courses`:
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/courses` | List courses |
+| GET | `/api/courses/{id}` | Get one course |
+| POST | `/api/courses` | Create a course |
+| PUT | `/api/courses/{id}` | Update a course |
+| DELETE | `/api/courses/{id}` | Delete a course |
+
+Example request body:
+
 ```json
 {
   "title": "Java Backend Development",
@@ -70,35 +100,31 @@ Example `POST /api/courses`:
 ```
 
 ### Registrations
-- `GET /api/registrations` — list registrations
-- `POST /api/registrations?studentId=1&courseId=1` — register a student
-- `DELETE /api/registrations/{id}` — cancel a registration
 
-The API checks that the student and course exist, blocks duplicate student-course registrations, and checks course capacity before saving.
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/registrations` | List registrations |
+| POST | `/api/registrations?studentId=1&courseId=1` | Register a student |
+| DELETE | `/api/registrations/{id}` | Cancel a registration |
 
-## Quick Postman walkthrough
-1. Create a student with `POST /api/students`.
-2. Create a course with `POST /api/courses`.
-3. Register using `POST /api/registrations?studentId=1&courseId=1`.
-4. Try the same registration again; expect a `400 Bad Request`.
-5. Try an unknown student or course ID; expect a `404 Not Found`.
-6. Try invalid email or missing fields; expect a `400 Bad Request`.
+Use the actual student and course IDs returned by the API.
 
-## Current scope and next improvements
-Included in the starter implementation:
-- CRUD for students and courses
-- JPA entity relationships and MySQL persistence
-- request validation
-- duplicate email/course-code and duplicate registration checks
-- course-capacity check
-- centralized API error responses
+## Business Rules Tested
 
-Good next steps:
-- add DTOs so entities are not exposed directly
-- add pagination and sorting
-- add service layer and transactional/concurrency-safe capacity enforcement
-- add integration tests using Testcontainers or a test database
-- add OpenAPI/Swagger documentation
-- add authentication/authorization if needed
+- Duplicate course codes are rejected.
+- A student cannot register for the same course twice.
+- Registrations are rejected when a course reaches its capacity.
+- Student, course, and registration data are persisted in MySQL.
 
-This project currently has no frontend, login system, JWT, or production deployment. Do not claim those features until implemented and tested.
+## Future Improvements
+
+- Add automated integration tests.
+- Introduce DTOs and a service layer.
+- Add pagination and sorting.
+- Improve transaction and concurrency handling for course capacity.
+- Add Swagger/OpenAPI documentation.
+- Add authentication and authorization if required.
+
+## Project Scope
+
+This project currently focuses on backend REST API development. A frontend, authentication system, JWT security, and production deployment are not included in the current implementation.
